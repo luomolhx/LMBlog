@@ -9,6 +9,7 @@ import com.luomo.domian.entity.Article;
 import com.luomo.domian.vo.HotArticleVo;
 import com.luomo.mapper.ArticleMapper;
 import com.luomo.service.ArticleService;
+import com.luomo.utils.BeanCopyUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -40,12 +41,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         List<Article> articles = page.getRecords();
         // Bean拷贝
-        List<HotArticleVo> articleVos = new ArrayList<>();
-        for (Article article : articles) {
-            HotArticleVo vo = new HotArticleVo();
-            BeanUtils.copyProperties(article, vo);
-            articleVos.add(vo);
-        }
-        return ResponseResult.okResult(articleVos);
+        List<HotArticleVo> vos = BeanCopyUtils.copyBeanList(articles,HotArticleVo.class);
+        return ResponseResult.okResult(vos);
     }
 }
