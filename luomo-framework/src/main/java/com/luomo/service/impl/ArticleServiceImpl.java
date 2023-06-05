@@ -5,10 +5,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.luomo.domian.ResponseResult;
 import com.luomo.domian.entity.Article;
+import com.luomo.domian.vo.HotArticleVo;
 import com.luomo.mapper.ArticleMapper;
 import com.luomo.service.ArticleService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,7 +38,13 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         page(page, queryWrapper);
 
         List<Article> articles = page.getRecords();
-
-        return ResponseResult.okResult(articles);
+        // Bean拷贝
+        List<HotArticleVo> articleVos = new ArrayList<>();
+        for (Article article : articles) {
+            HotArticleVo vo = new HotArticleVo();
+            BeanUtils.copyProperties(article, vo);
+            articleVos.add(vo);
+        }
+        return ResponseResult.okResult(articleVos);
     }
 }
