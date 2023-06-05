@@ -10,10 +10,8 @@ import com.luomo.domian.vo.HotArticleVo;
 import com.luomo.mapper.ArticleMapper;
 import com.luomo.service.ArticleService;
 import com.luomo.utils.BeanCopyUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,7 +39,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         List<Article> articles = page.getRecords();
         // Bean拷贝
-        List<HotArticleVo> vos = BeanCopyUtils.copyBeanList(articles,HotArticleVo.class);
+        List<HotArticleVo> vos = BeanCopyUtils.copyBeanList(articles, HotArticleVo.class);
         return ResponseResult.okResult(vos);
     }
 }
