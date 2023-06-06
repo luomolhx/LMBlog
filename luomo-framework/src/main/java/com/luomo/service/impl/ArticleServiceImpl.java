@@ -6,13 +6,16 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.luomo.constants.SystemConstants;
 import com.luomo.domian.ResponseResult;
 import com.luomo.domian.entity.Article;
+import com.luomo.domian.vo.ArticleVo;
 import com.luomo.domian.vo.HotArticleVo;
+import com.luomo.domian.vo.PageVo;
 import com.luomo.mapper.ArticleMapper;
 import com.luomo.service.ArticleService;
 import com.luomo.utils.BeanCopyUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * ClassName: ArticleServiceImpl
@@ -42,4 +45,27 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         List<HotArticleVo> vos = BeanCopyUtils.copyBeanList(articles, HotArticleVo.class);
         return ResponseResult.okResult(vos);
     }
+
+    @Override
+    public ResponseResult articleList(Integer pageNum, Integer pageSize, Long categoryId) {
+        // 查询条件
+        LambdaQueryWrapper<Article> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        // 如果传入categoryId 就要求查询时要和传入的一致
+        lambdaQueryWrapper.eq(Objects.nonNull(categoryId) && categoryId > 0, Article::getCategoryId, categoryId);
+        // 文章状态要正常
+        lambdaQueryWrapper.eq(Article::getStatus, SystemConstants.CATEGORY_STATUS_NORMAL);
+        // 且置顶文章需要排在最前面 对isTop进行排序
+        lambdaQueryWrapper.orderByDesc(Article::getIsTop);
+        // 分页查询
+        Page<Article> page = new Page<>(pageNum, pageSize);
+        page(page, lambdaQueryWrapper);
+        // 封装查询结果
+        List<ArticleVo> articleVos = BeanCopyUtils.copyBeanList(page.getRecords(), ArticleVo.class);
+        System.out.println(page.getTotal());
+        PageVo pageVo = new PageVo(articleVos, page.getTotal());
+
+        return ResponseResult.okResult(pageVo);
+    }
+
+
 }
