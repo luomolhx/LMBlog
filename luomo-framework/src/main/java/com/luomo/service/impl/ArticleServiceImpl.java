@@ -6,12 +6,15 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.luomo.constants.SystemConstants;
 import com.luomo.domian.ResponseResult;
 import com.luomo.domian.entity.Article;
+import com.luomo.domian.entity.Category;
 import com.luomo.domian.vo.ArticleVo;
 import com.luomo.domian.vo.HotArticleVo;
 import com.luomo.domian.vo.PageVo;
 import com.luomo.mapper.ArticleMapper;
 import com.luomo.service.ArticleService;
+import com.luomo.service.CategoryService;
 import com.luomo.utils.BeanCopyUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,6 +31,9 @@ import java.util.Objects;
  */
 @Service
 public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> implements ArticleService {
+
+    @Autowired
+    CategoryService categoryService;
     @Override
     public ResponseResult hotArticleList() {
         // 查询热门文章 封装成ResponseResult返回
@@ -59,9 +65,14 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         // 分页查询
         Page<Article> page = new Page<>(pageNum, pageSize);
         page(page, lambdaQueryWrapper);
+        // 查询categoryName
+        List<Article> articles = page.getRecords();
+        for (Article article : articles) {
+            Category category = categoryService.getById(article.getCategoryId());
+            article.setCategoryName(category.getName());
+        }
         // 封装查询结果
         List<ArticleVo> articleVos = BeanCopyUtils.copyBeanList(page.getRecords(), ArticleVo.class);
-        System.out.println(page.getTotal());
         PageVo pageVo = new PageVo(articleVos, page.getTotal());
 
         return ResponseResult.okResult(pageVo);
