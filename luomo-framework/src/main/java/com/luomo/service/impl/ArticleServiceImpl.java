@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.luomo.constants.SystemConstants;
 import com.luomo.domian.ResponseResult;
 import com.luomo.domian.entity.Article;
+import com.luomo.domian.entity.Category;
+import com.luomo.domian.vo.ArticleDetailVo;
 import com.luomo.domian.vo.ArticleVo;
 import com.luomo.domian.vo.HotArticleVo;
 import com.luomo.domian.vo.PageVo;
@@ -86,6 +88,22 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         PageVo pageVo = new PageVo(articleVos, page.getTotal());
 
         return ResponseResult.okResult(pageVo);
+    }
+
+    @Override
+    public ResponseResult getArticleDetail(Long id) {
+        // 根据文章id 查询文章
+        Article article = getById(id);
+        // 封装成Vo
+        ArticleDetailVo articleDetailVo = BeanCopyUtils.copyBean(article, ArticleDetailVo.class);
+        // 根据分类id 查询分类名
+        Long categoryId = articleDetailVo.getCategoryId();
+        Category category = categoryService.getById(categoryId);
+        if (category != null) {
+            articleDetailVo.setCategoryName(category.getName());
+        }
+        // 封装响应并返回
+        return ResponseResult.okResult(articleDetailVo);
     }
 
 

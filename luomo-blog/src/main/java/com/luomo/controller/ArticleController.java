@@ -4,6 +4,7 @@ import com.luomo.domian.ResponseResult;
 import com.luomo.service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,5 +40,11 @@ public class ArticleController {
         ResponseResult result = articleService.articleList(pageNum, pageSize, categoryId);
 
         return result;
+    }
+
+    @GetMapping("/{aid}")
+    public ResponseResult getArticleDetail(@PathVariable("aid") Long id) {
+
+        return articleService.getArticleDetail(id);
     }
 }
