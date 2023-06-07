@@ -32,5 +32,7 @@ public class ArticleVo {
     // 访问量
     private Long viewCount;
 
+    private Date createTime;
+
     private Date updateTime;
 }

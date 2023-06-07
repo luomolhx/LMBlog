@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.luomo.constants.SystemConstants;
 import com.luomo.domian.ResponseResult;
 import com.luomo.domian.entity.Article;
-import com.luomo.domian.entity.Category;
 import com.luomo.domian.vo.ArticleVo;
 import com.luomo.domian.vo.HotArticleVo;
 import com.luomo.domian.vo.PageVo;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * ClassName: ArticleServiceImpl
@@ -34,6 +34,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Autowired
     CategoryService categoryService;
+
     @Override
     public ResponseResult hotArticleList() {
         // 查询热门文章 封装成ResponseResult返回
@@ -66,11 +67,20 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         Page<Article> page = new Page<>(pageNum, pageSize);
         page(page, lambdaQueryWrapper);
         // 查询categoryName
+        // for循环方式
+        /*
         List<Article> articles = page.getRecords();
         for (Article article : articles) {
             Category category = categoryService.getById(article.getCategoryId());
             article.setCategoryName(category.getName());
         }
+        */
+        // stream流方式
+        List<Article> articles = page.getRecords();
+        // 获取分类id 查询分类名称
+        // 把分类名设置给article
+        articles.stream().map(article -> article.setCategoryName(categoryService.getById(article.getCategoryId()).getName()))
+                .collect(Collectors.toList());
         // 封装查询结果
         List<ArticleVo> articleVos = BeanCopyUtils.copyBeanList(page.getRecords(), ArticleVo.class);
         PageVo pageVo = new PageVo(articleVos, page.getTotal());
